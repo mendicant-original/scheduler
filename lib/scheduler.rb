@@ -8,17 +8,19 @@ class Scheduler
   extend Forwardable
   include Runt
 
-  attr_accessor :duration
-
   def initialize(&block)
     @schedule = Schedule.new
-    instance_eval(&block)
+    instance_eval(&block) if block_given?
   end
 
-  def duration(d)
-    @duration = d
+  # duration in minutes of the proposed meeting
+  def duration(minutes)
+    @duration = minutes
   end
 
+  # adds a participant to the scheduler
+  # must be used in block form
+  # see scheduler_spec.rb for examples
   def participant(name, &block)
     event   = Event.new(name)
     exp     = Expression.new.instance_eval(&block)
@@ -34,18 +36,22 @@ class Scheduler
     @time_range = DateRange.new(date, date + 6)
   end
 
-  # 
+  # returns an array of arrays containing:
+  #    time ranges (one for every 15 minutes of the week)
+  #    attendees who could make it at that time
   def attendance
     results = Array.new
     each_increment do |dr|
-      users = @schedule.select do |ev,xpr| 
-        xpr.include?(dr.min) && xpr.include?(dr.max)
+      attendees = @schedule.select do |evt,expr| 
+        expr.include?(dr.min) && expr.include?(dr.max)
       end
-      results << [dr, users]
+      results << [dr, attendees]
     end
     results
   end
 
+  # compacts adjoining time ranges where the attendees are equal
+  # to make the array easier to read
   def compacted_attendance
     results = Array.new
     attendance.inject do |(sd, su),(vd,vu)| 
@@ -56,14 +62,19 @@ class Scheduler
         [vd,vu]
       end
     end
-    results
+    results.reject{|d,u| u.empty?}
   end
 
+  # places the time ranges with the most attendees at the top of the stack
   def best_attendance
-    compacted_attendance.reject{|d,u| u.empty?}.
-      sort{|(d1, u1),(d2,u2)| u2.size <=> u1.size }
+    compacted_attendance.sort{|(d1, u1),(d2,u2)| u2.size <=> u1.size }
   end
 
+  # iterates over the time_range 
+  # yielding a DateRange that is @duration in length 
+  #
+  # this doesn't seem right to me
+  # there has to be a better way to do this
   def each_increment(minutes=15)
     min = utc_time(@time_range.min)
     max = utc_time(@time_range.max)
@@ -76,6 +87,16 @@ class Scheduler
     end
   end
 
+  def to_a
+    best_attendance.map{|d,u| [range_string(d), u.map{|i| i.to_s}.sort] }
+  end
+
+  def to_s
+    to_a.map{|d,u| [d, u].flatten.join("\n  ") }.join("\n")
+  end
+
+  ## helper methods
+
   def utc_time(pdate)
     Time.utc(pdate.year,pdate.mon,pdate.day,pdate.hour,pdate.min)
   end
@@ -83,14 +104,6 @@ class Scheduler
   def range_string(dr)
     max = dr.max.strftime("%H:%M")
     dr.min.strftime("%A %H:%M-#{max} %Z")
-  end
-
-  def to_a
-    best_attendance.map{|d,u| [range_string(d), u.map{|i| i.to_s}.sort] }
-  end
-
-  def to_s
-    to_a.map{|d,u| [d, u].flatten.join("\n  ") }.join("\n")
   end
 
 end

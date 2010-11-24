@@ -1,6 +1,11 @@
 class Scheduler
-
+ 
   class Expression
+    
+    # the Expression class provides a simple DSL
+    # for creating Temporal expressions.  
+    # runt comes with it's own, but I didn't care for it.
+
     include Runt
 
     DAYS = {
@@ -15,12 +20,18 @@ class Scheduler
 
     WEEKDAYS = [Mon, Tue, Wed, Thu, Fri]
 
+    # returns a temporal expression for the given day
+    # if :from and :to are given, it will be limited to that 
+    # period of time
     def on(day, opts)
       exp = diweek(day)
       exp = exp & reday(opts) if opts[:from] && opts[:to]
       exp
     end
       
+    # similar to #on, but for multiple days
+    # if :from and :to are given, all days will be limited to that 
+    # period of time  
     def every(*args)
       first = diweek(args.shift)
       args.inject(first) do |m,e|
@@ -33,11 +44,16 @@ class Scheduler
       end
     end
 
+    # similar to #every, but for multiple days
+    # if :from and :to are given, all days will be limited to that 
+    # period of time 
     def weekdays(opts)
       exp = WEEKDAYS.map{|i| DIWeek.new(i)}.inject{|m,e| m | e }
       exp = exp & reday(opts) if opts[:from] && opts[:to]
       exp
     end
+
+    ## helper methods to DRY up the code
 
     def diweek(sym)
       DIWeek.new(DAYS[sym])

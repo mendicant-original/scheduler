@@ -1,7 +1,7 @@
 describe "Scheduler" do
 
   before do
-    @sched = Scheduler.new{}
+    @sched = Scheduler.new
   end
 
   describe "week_of" do
@@ -30,8 +30,6 @@ describe "Scheduler" do
   describe "to_a" do
 
     it "should be an array of all start times that have valid participants" do
-      # @sched.duration = 90
-      # @sched.week_of(2010,11,21)
 
       schedule = Scheduler.new do 
 
