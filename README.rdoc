@@ -9,26 +9,57 @@ An application for determining the best time to conduct meetings.
 
 == SYNOPSIS:
 
-s = Scheduler.new
-s.week_of  = "2010.11.29"
-s.duration = 90
+    schedule = Scheduler.new do 
 
-s.participant("Gregory Brown", ["Monday 15:00 - 19:00 UTC", 
-                                "Tuesday 20:00 - 23:00 UTC",
-                                "Thursday 15:00 - 19:00 UTC"])
+      week_of 2010,11,21
+      
+      duration 90
 
+      participant('Malcolm Reynolds') do
+        on(:monday,    :from => [15,00], :to => [18,00] ) |
+        on(:wednesday, :from => [20,00], :to => [23,00] ) |
+        on(:friday,    :from => [16,00], :to => [19,00] )
+      end
 
-s.participant("Jordan Byron", ["Monday 12:00 - 19:00 UTC", 
-                               "Tuesday 20:00 - 23:00 UTC",
-                               "Thursday 15:00 - 19:00 UTC"])
+      participant('Hoban Washburne') do
+        on(:monday,    :from => [15,00], :to => [18,00] ) |
+        on(:wednesday, :from => [20,00], :to => [23,00] ) |
+        on(:thursday,  :from => [15,00], :to => [18,30] )
+      end
 
+      participant('Jayne Cobb') do
+        weekdays(:from => [15,00], :to => [18,00] )
+      end
 
-# ignore the above times because they may not make sense, but the idea would be outputting something like this.
+      participant('Zoe Washburne') do
+        every(:monday, :tuesday, :thursday, :from => [15,00], :to => [18,00] )
+      end
 
+      participant('Inara Serra') do
+        every(:monday, :tuesday, :thursday )
+      end
+       
+    end
 
-Monday 15:00 UTC:
-  Gregory Brown
-  Jordan Byron
+    puts schedule
+
+====
+
+    Monday 15:00-18:00 +00:00
+      Hoban Washburne
+      Inara Serra
+      Jayne Cobb
+      Malcolm Reynolds
+      Zoe Washburne
+    Thursday 15:00-18:00 +00:00
+      Hoban Washburne
+      Inara Serra
+      Jayne Cobb
+      Zoe Washburne
+    Tuesday 15:00-18:00 +00:00
+      Inara Serra
+      Jayne Cobb
+      Zoe Washburne
 
 
 == REQUIREMENTS:
