@@ -1,3 +1,6 @@
+$LOAD_PATH << File.expand_path(File.dirname(__FILE__))
+
+require 'rubygems'
 require 'runt'
 require 'forwardable'
 require 'scheduler/expression'
@@ -7,7 +10,7 @@ class Scheduler
 
   extend Forwardable
   include Runt
-
+    
   def initialize(&block)
     @schedule = Schedule.new
     instance_eval(&block) if block_given?
@@ -108,3 +111,59 @@ class Scheduler
 
 end
 
+# extensions for loading from file
+
+require 'fastercsv'
+require 'yaml'
+require 'scheduler/loadable'
+require 'scheduler/helpers/date_and_time_helper'
+
+class Scheduler
+
+  extend Loadable
+  include Helpers::DateAndTimeHelper
+
+  load_lines_of_format :csv do |sched, row, opts|
+    opts[:participant] ||= 0
+    opts[:days] ||= 1
+    opts[:from] ||= 2
+    opts[:to] ||= 3
+    FasterCSV.parse(row) do |r|
+      unless r.field_row?
+        sched.participant(r[opts[:participant]]) do
+          days = (parse_days(r[opts[:days]]) || all_days)
+          every( *(days << {
+                      :from => parse_time(r[opts[:from]]),
+                      :to => parse_time(r[opts[:to]])
+                    }
+                  ) 
+               )
+        end
+      end
+    end
+    sched
+  end
+
+  load_files_of_format :yaml do |input, opts|
+    yaml = YAML.load(input)
+    raise ArgumentError unless yaml.is_a?(Hash)
+    new do
+      yaml.each do |partic, avails|
+        raise ArgumentError unless avails.is_a?(Hash)
+        opts[:zone] = avails.delete('zone') if avails['zone']
+        args = []
+        avails.each do |dexpr, texpr|
+          days = parse_days(dexpr)
+          fr, to = parse_time_range(texpr, opts[:zone])
+          args << (days << { :from => fr, :to => to })
+        end
+        participant(partic) do
+          args.each do |arg|
+            every( *arg )
+          end
+        end
+      end
+    end
+  end
+  
+end

@@ -9,6 +9,8 @@ An application for determining the best time to conduct meetings.
 
 == SYNOPSIS:
 
+==== Basic usage
+
     schedule = Scheduler.new do 
 
       week_of 2010,11,21
@@ -43,7 +45,7 @@ An application for determining the best time to conduct meetings.
 
     puts schedule
 
-====
+==== Output
 
     Monday 15:00-18:00 +00:00
       Hoban Washburne
@@ -61,7 +63,24 @@ An application for determining the best time to conduct meetings.
       Jayne Cobb
       Zoe Washburne
 
+      
+==== Loading from csv file
 
+    schedule = Scheduler.load_lines_from('some/input/file.csv', :csv)
+    schedule.week_of 2010,11,21
+    schedule.duration 90      
+    
+    puts schedule
+    
+==== Loading from yaml file
+    
+    schedule = Scheduler.load_from('some/input/file.yaml', :yaml)
+    schedule.week_of 2010,11,21
+    schedule.duration 90      
+    
+    puts schedule
+    
+    
 == REQUIREMENTS:
 
 * {runt}[runt.rubyforge.org]

@@ -26,7 +26,7 @@ class Scheduler
     def on(day, opts)
       exp = diweek(day)
       exp = exp & reday(opts) if opts[:from] && opts[:to]
-      exp
+      @exp = @exp ? (@exp | exp) : exp
     end
       
     # similar to #on, but for multiple days
@@ -34,7 +34,7 @@ class Scheduler
     # period of time  
     def every(*args)
       first = diweek(args.shift)
-      args.inject(first) do |m,e|
+      exp = args.inject(first) do |m,e|
         case e
         when Symbol
           m | diweek(e)
@@ -42,6 +42,7 @@ class Scheduler
           m & reday(e)
         end
       end
+      @exp = @exp ? (@exp | exp) : exp
     end
 
     # similar to #every, but for multiple days
@@ -50,7 +51,7 @@ class Scheduler
     def weekdays(opts)
       exp = WEEKDAYS.map{|i| DIWeek.new(i)}.inject{|m,e| m | e }
       exp = exp & reday(opts) if opts[:from] && opts[:to]
-      exp
+      @exp = @exp ? (@exp | exp) : exp
     end
 
     ## helper methods to DRY up the code
