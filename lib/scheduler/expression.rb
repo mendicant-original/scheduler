@@ -6,19 +6,17 @@ class Scheduler
     # for creating Temporal expressions.  
     # runt comes with it's own, but I didn't care for it.
 
-    include Runt
-
     DAYS = {
-      :sunday    => Sunday,
-      :monday    => Monday,
-      :tuesday   => Tuesday,
-      :wednesday => Wednesday,
-      :thursday  => Thursday,
-      :friday    => Friday,
-      :saturday  => Saturday
+      :Sunday    => Runt::Sunday,
+      :Monday    => Runt::Monday,
+      :Tuesday   => Runt::Tuesday,
+      :Wednesday => Runt::Wednesday,
+      :Thursday  => Runt::Thursday,
+      :Friday    => Runt::Friday,
+      :Saturday  => Runt::Saturday
     }
 
-    WEEKDAYS = [Mon, Tue, Wed, Thu, Fri]
+    WEEKDAYS = [Runt::Mon, Runt::Tue, Runt::Wed, Runt::Thu, Runt::Fri]
 
     # returns a temporal expression for the given day
     # if :from and :to are given, it will be limited to that 
@@ -48,7 +46,7 @@ class Scheduler
     # if :from and :to are given, all days will be limited to that 
     # period of time 
     def weekdays(opts)
-      exp = WEEKDAYS.map{|i| DIWeek.new(i)}.inject{|m,e| m | e }
+      exp = WEEKDAYS.map{|i| Runt::DIWeek.new(i)}.inject{|m,e| m | e }
       exp = exp & reday(opts) if opts[:from] && opts[:to]
       exp
     end
@@ -56,14 +54,13 @@ class Scheduler
     ## helper methods to DRY up the code
 
     def diweek(sym)
-      DIWeek.new(DAYS[sym])
+      Runt::DIWeek.new(DAYS[sym])
     end
 
     def reday(opts)
       raise ArgumentError unless opts[:from] && opts[:to]
-      fh, fm = opts[:from]
-      th, tm = opts[:to]
-      REDay.new(fh,fm,th,tm)
+      args = opts[:from] + opts[:to]
+      Runt::REDay.new(*args)
     end
 
   end

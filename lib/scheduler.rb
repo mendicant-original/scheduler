@@ -6,10 +6,9 @@ class Scheduler
   VERSION = '0.0.1'
 
   extend Forwardable
-  include Runt
 
   def initialize(&block)
-    @schedule = Schedule.new
+    @schedule = Runt::Schedule.new
     instance_eval(&block) if block_given?
   end
 
@@ -22,9 +21,9 @@ class Scheduler
   # must be used in block form
   # see scheduler_spec.rb for examples
   def participant(name, &block)
-    event   = Event.new(name)
-    exp     = Expression.new.instance_eval(&block)
-    @schedule.add(event, exp)
+    event          = Runt::Event.new(name)
+    expression     = Expression.new.instance_eval(&block)
+    @schedule.add(event, expression)
   end
 
   def_delegator :@schedule, :events, :participants
@@ -32,8 +31,8 @@ class Scheduler
   # will create an expression starting on the year month & day given
   # and lasting 7 days.
   def week_of(year,month,day)
-    date  = PDate.new(DPrecision::Precision.day,year,month,day)
-    @time_range = DateRange.new(date, date + 6)
+    date  = Runt::PDate.day(year,month,day)
+    @time_range = Runt::DateRange.new(date, date + 6)
   end
 
   # returns an array of arrays containing:
@@ -41,11 +40,12 @@ class Scheduler
   #    attendees who could make it at that time
   def attendance
     results = Array.new
-    each_increment do |dr|
-      attendees = @schedule.select do |evt,expr| 
-        expr.include?(dr.min) && expr.include?(dr.max)
+    each_increment do |date_range|
+      attendees = @schedule.select do |event,availability| 
+        availability.include?(date_range.min) && 
+        availability.include?(date_range.max)
       end
-      results << [dr, attendees]
+      results << [date_range, attendees]
     end
     results
   end
@@ -54,20 +54,20 @@ class Scheduler
   # to make the array easier to read
   def compacted_attendance
     results = Array.new
-    attendance.inject do |(sd, su),(vd,vu)| 
-      if su == vu
-        [DateRange.new(sd.min, vd.max), vu]
+    attendance.inject do |(m_dr, m_p),(o_dr,o_p)| 
+      if m_p == o_p
+        [Runt::DateRange.new(m_dr.min, o_dr.max), o_p]
       else
-        results <<[sd,su]
-        [vd,vu]
+        results <<[m_dr,m_p]
+        [o_dr,o_p]
       end
     end
-    results.reject{|d,u| u.empty?}
+    results.reject{|_,participants| participants.empty?}
   end
 
   # places the time ranges with the most attendees at the top of the stack
   def best_attendance
-    compacted_attendance.sort{|(d1, u1),(d2,u2)| u2.size <=> u1.size }
+    compacted_attendance.sort{|(dr_a, p_a),(dr_b,p_b)| p_b.size <=> p_a.size }
   end
 
   # iterates over the time_range 
@@ -80,19 +80,18 @@ class Scheduler
     max = utc_time(@time_range.max)
 
     (min..max).step(minutes * 60) do |t|
-      t1 = PDate.new(DPrecision::Precision.min, 
-                           t.year, t.mon, t.day, t.hour, t.min)
-      t2 = t1 + @duration
-      yield DateRange.new(t1, t2)
+      start = Runt::PDate.min(t.year, t.mon, t.day, t.hour, t.min)
+      stop = start + @duration
+      yield Runt::DateRange.new(start, stop)
     end
   end
 
   def to_a
-    best_attendance.map{|d,u| [range_string(d), u.map{|i| i.to_s}.sort] }
+    best_attendance.map{|dr,p| [range_string(dr), p.map{|i| i.to_s}.sort] }
   end
 
   def to_s
-    to_a.map{|d,u| [d, u].flatten.join("\n  ") }.join("\n")
+    to_a.map{|d,u| [dr, p].flatten.join("\n  ") }.join("\n")
   end
 
   ## helper methods
