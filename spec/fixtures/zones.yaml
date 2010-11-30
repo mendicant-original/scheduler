@@ -1,0 +1,19 @@
+"Malcolm Reynolds":
+  zone: "-05:00"
+  Mon: 15:00 - 18:00
+  Wed: 20:00 - 23:00
+  Fri: 16:00 - 19:00
+"Hoban Washburne":
+  zone: "-05:00"
+  Monday: 15:00 - 23:00
+  Wednesday: 20:00 - 23:00
+  Thursday: 15:00 - 18:30
+"Jayne Cobb":
+  zone: "-05:00"
+  Mon,Tues,Wed,Thurs,Fri: 15:00 - 18:00
+"Zoe Washburne":
+  zone: "-05:00"
+  Monday,Tuesday,Thursday: 15:00 - 18:00
+"Inara Serra":
+  zone: "-05:00"
+  Monday,Tues,Thurs: 

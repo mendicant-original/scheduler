@@ -20,13 +20,16 @@ class Scheduler
 
     WEEKDAYS = [Mon, Tue, Wed, Thu, Fri]
 
+    def elems; @elems ||= []; end
+    
     # returns a temporal expression for the given day
     # if :from and :to are given, it will be limited to that 
     # period of time
     def on(day, opts)
       exp = diweek(day)
       exp = exp & reday(opts) if opts[:from] && opts[:to]
-      @exp = @exp ? (@exp | exp) : exp
+      elems << exp
+      self
     end
       
     # similar to #on, but for multiple days
@@ -42,7 +45,8 @@ class Scheduler
           m & reday(e)
         end
       end
-      @exp = @exp ? (@exp | exp) : exp
+      elems << exp
+      self
     end
 
     # similar to #every, but for multiple days
@@ -51,9 +55,20 @@ class Scheduler
     def weekdays(opts)
       exp = WEEKDAYS.map{|i| DIWeek.new(i)}.inject{|m,e| m | e }
       exp = exp & reday(opts) if opts[:from] && opts[:to]
-      @exp = @exp ? (@exp | exp) : exp
+      elems << exp
+      self
     end
 
+    
+    # evaluate (join) expressions
+    def join
+      return nil unless elems && !elems.empty?
+      elems[1..-1].inject(elems[0]) do |m, e|
+        m = (m | e)
+      end
+    end
+    
+    
     ## helper methods to DRY up the code
 
     def diweek(sym)
@@ -61,7 +76,7 @@ class Scheduler
     end
 
     def reday(opts)
-      raise ArgumentError unless opts[:from] && opts[:to]
+      raise ArgumentError, "No :from or :to option passed" unless opts[:from] && opts[:to]
       fh, fm = opts[:from]
       th, tm = opts[:to]
       REDay.new(fh,fm,th,tm)

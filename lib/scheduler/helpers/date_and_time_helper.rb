@@ -57,14 +57,18 @@ module Helpers
       day
     end
     
+    # note time range must have times split by ' - ' (hyphen with spaces)
     def parse_time_range(expr, zone = nil)
       return nil unless expr && !expr.empty?
-      expr.split(' - ').map {|t| parse_time(t.strip, zone)}[0..1]
+      zone ||= '+00:00'
+      expr.split(' - ')[0..1].map {|t| parse_time(t.strip, zone)}
     end
     
-    # TODO: add zone to expr if no zone specified
+    # add zone to expr if no zone specified
     def parse_time(expr, zone = nil)
       return nil unless expr && !expr.empty?
+      zone ||= '+00:00'
+      expr = "#{expr} #{zone}" if expr.strip =~ /^\d{1,2}:\d{2}$/
       t = Time.parse(expr).getutc
       [t.hour, t.min]
     end
