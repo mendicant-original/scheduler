@@ -5,17 +5,21 @@ describe "Scheduler::Expression" do
   describe "multiple #on" do
   
     subject do
-      Scheduler::Expression.new.instance_eval do
+      exp = Scheduler::Expression.new
+      exp.instance_eval do
         on :monday, :from => [1,00], :to => [2,00]
         on :tuesday, :from => [2,00], :to => [3,00]
       end
+      exp.join
     end
     
     let :comparator do
-      Scheduler::Expression.new.instance_eval do
+      exp = Scheduler::Expression.new
+      exp.instance_eval do
         on(:monday, :from => [1,00], :to => [2,00]) |
         on(:tuesday, :from => [2,00], :to => [3,00])
       end
+      exp.join
     end
     
     let :times do

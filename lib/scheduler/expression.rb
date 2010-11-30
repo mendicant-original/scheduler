@@ -29,7 +29,7 @@ class Scheduler
       exp = diweek(day)
       exp = exp & reday(opts) if opts[:from] && opts[:to]
       elems << exp
-      self
+      exp
     end
       
     # similar to #on, but for multiple days
@@ -46,7 +46,7 @@ class Scheduler
         end
       end
       elems << exp
-      self
+      exp
     end
 
     # similar to #every, but for multiple days
@@ -56,7 +56,7 @@ class Scheduler
       exp = WEEKDAYS.map{|i| DIWeek.new(i)}.inject{|m,e| m | e }
       exp = exp & reday(opts) if opts[:from] && opts[:to]
       elems << exp
-      self
+      exp
     end
 
     

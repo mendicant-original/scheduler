@@ -18,12 +18,11 @@ describe "Scheduler" do
 
   describe "participant" do
     it "should add a participant" do
-      a = ( Runt::DIWeek.new(Runt::Mon) & Runt::REDay.new(15,00,19,00) ) | 
-          ( Runt::DIWeek.new(Runt::Tue) & Runt::REDay.new(20,00,23,00) ) | 
-          ( Runt::DIWeek.new(Runt::Thu) & Runt::REDay.new(15,00,19,00) ) 
-
-
-      @sched.participant("Gregory Brown"){ a }
+      @sched.participant("Gregory Brown") do
+        on(:monday, :from => [15,00], :to => [19,00])
+        on(:tuesday, :from => [20,00], :to => [23,00])
+        on(:thursday, :from => [15,00], :to => [19,00])
+      end
       time = Runt::PDate.min(2010,11,23,20,15)
       @sched.participants(time).first.to_s.should == "Gregory Brown"
     end
