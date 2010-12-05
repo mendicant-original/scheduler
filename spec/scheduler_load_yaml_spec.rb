@@ -62,13 +62,12 @@ describe 'load from yaml file with timezones specified per participant' do
 
 end
 
-__END__
 
 describe 'load from yaml file with timezones specified per time' do
 
   include LoadHelper
 
-  let :input_file { 'indiv_zones.yaml' }
+  let(:input_file) { 'indiv_zones.yaml' }
   let :expected do
     ["Monday 15:00-18:00 +00:00", 
       ["Gregory Brown", 

@@ -1,24 +1,27 @@
-
-## Usage:
-##
+# Provides general-purpose class methods for loading input files of different formats.
+# Accomodates either per-line and per-file parsing
+# NOTE I am not sure there isn't a better way to do this and am open to suggestions
+#
+## Usage example:
+#
 # class Foo
 #   extend Loadable
 #
 #   load_lines_of_format :csv do |foo, input_row, opts|
-#    foo.append_row(input_row)
+#    foo.do_something_with(input_row, opts)
 #    foo
 #   end
 #   
 #   load_files_of_format :yaml do |input, opts|
 #    yaml = YAML.load(input)
-#    new(yaml, opts)
+#    new.do_something_with_and_return_foo(yaml, opts)
 #   end
 #   
 # end
 #
 # foo = Foo.load(myfile, :yaml)
 # foo2 = Foo.load_lines(myfile, :csv)
-
+#
 module Loadable
 
   def load_from(file, input_type, opts = {})

@@ -117,8 +117,10 @@ end
 
 
 
-# extensions for loading from file
-
+# Extensions for loading from file
+# Possibly for clarity this should be moved to a different source file
+# See README for example of YAML file format implemented below
+#
 require 'yaml'
 require 'scheduler/loadable'
 require 'scheduler/helpers/date_and_time_helper'
@@ -128,7 +130,7 @@ class Scheduler
   extend Loadable
   include Helpers::DateAndTimeHelper
 
-
+  
   load_files_of_format :yaml do |input, opts|
     yaml = YAML.load(input)
     raise ArgumentError unless yaml.is_a?(Hash)
