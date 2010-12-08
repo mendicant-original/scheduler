@@ -39,27 +39,27 @@ describe "Scheduler" do
         duration 90
 
         participant('Gregory Brown') do
-          on(:Monday,   :from => [14,00], :to => [19,00] ) |
-          on(:Tuesday,  :from => [20,00], :to => [23,00] ) |
-          on(:Thursday, :from => [15,00], :to => [19,00] )
+          on(:monday,   :from => [14,00], :to => [19,00] ) |
+          on(:tuesday,  :from => [20,00], :to => [23,00] ) |
+          on(:thursday, :from => [15,00], :to => [19,00] )
         end
 
         participant('Jordan Byron') do 
-          on(:Monday,    :from => [15,00], :to => [18,00] ) |
-          on(:Wednesday, :from => [20,00], :to => [23,00] ) |
-          on(:Thursday,  :from => [15,00], :to => [18,30] )
+          on(:monday,    :from => [15,00], :to => [18,00] ) |
+          on(:wednesday, :from => [20,00], :to => [23,00] ) |
+          on(:thursday,  :from => [15,00], :to => [18,30] )
         end
       
         participant('Hoban Washburne') do
-          on(:Monday,    :from => [15,00], :to => [18,00] ) |
-          on(:Wednesday, :from => [20,00], :to => [23,00] ) |
-          on(:Thursday,  :from => [15,00], :to => [18,30] )
+          on(:monday,    :from => [15,00], :to => [18,00] ) |
+          on(:wednesday, :from => [20,00], :to => [23,00] ) |
+          on(:thursday,  :from => [15,00], :to => [18,30] )
         end
 
         participant('Malcolm Reynolds') do
-          on(:Monday,    :from => [15,00], :to => [18,00] ) |
-          on(:Wednesday, :from => [20,00], :to => [23,00] ) |
-          on(:Friday,    :from => [16,00], :to => [19,00] )
+          on(:monday,    :from => [15,00], :to => [18,00] ) |
+          on(:wednesday, :from => [20,00], :to => [23,00] ) |
+          on(:friday,    :from => [16,00], :to => [19,00] )
         end
 
         participant('Jayne Cobb') do
@@ -67,11 +67,11 @@ describe "Scheduler" do
         end
 
         participant('Zoe Washburne') do
-          every(:Monday, :Tuesday, :Thursday, :from => [15,00], :to => [18,00] )
+          every(:monday, :tuesday, :thursday, :from => [15,00], :to => [18,00] )
         end
 
         participant('Inara Serra') do
-          every(:Monday, :Tuesday, :Thursday )
+          every(:monday, :tuesday, :thursday )
         end
          
       end
