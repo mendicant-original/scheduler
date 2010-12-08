@@ -9,6 +9,8 @@ An application for determining the best time to conduct meetings.
 
 == SYNOPSIS:
 
+==== Basic usage
+
     schedule = Scheduler.new do 
 
       week_of 2010,11,21
@@ -43,7 +45,7 @@ An application for determining the best time to conduct meetings.
 
     puts schedule
 
-====
+==== Output
 
     Monday 15:00-18:00 +00:00
       Hoban Washburne
@@ -61,7 +63,39 @@ An application for determining the best time to conduct meetings.
       Jayne Cobb
       Zoe Washburne
 
-
+          
+==== Loading from yaml file
+    
+    # sample yaml file
+    
+      "Malcolm Reynolds":
+        zone: "-05:00"
+        Mon: 10:00 - 13:00
+        Wed: 15:00 - 18:00
+        Fri: 11:00 - 14:00
+      "Hoban Washburne":
+        zone: "-04:00"
+        Monday: 11:00 - 19:00
+        Wednesday: 16:00 - 19:00
+        Thursday: 11:00 - 14:30
+      "Jayne Cobb":
+        zone: "+05:00"
+        Mon,Tues,Wed,Thurs,Fri: 20:00 - 23:00
+      "Zoe Washburne":
+        zone: "+04:00"
+        Monday,Tuesday,Thursday: 19:00 - 22:00
+      "Inara Serra":
+        zone: "+00:00"
+        Monday,Tues,Thurs: 
+    
+    
+    schedule = Scheduler.load_from('some/input/file.yaml', :yaml)
+    schedule.week_of 2010,11,21
+    schedule.duration 90      
+    
+    puts schedule
+    
+    
 == REQUIREMENTS:
 
 * {runt}[runt.rubyforge.org]

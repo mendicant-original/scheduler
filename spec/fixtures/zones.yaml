@@ -1,0 +1,29 @@
+"Gregory Brown":
+  zone: "-06:00"
+  Monday: 8:00 - 13:00
+  Tuesday: 14:00 - 17:00
+  Thursday: 9:00 - 13:00
+"Jordan Byron": 
+  zone: "-01:00"
+  monday:         14:00 - 17:00
+  wednesday:      19:00 - 22:00
+  thursday:       14:00 - 17:30
+"Malcolm Reynolds":
+  zone: "-05:00"
+  Mon: 10:00 - 13:00
+  Wed: 15:00 - 18:00
+  Fri: 11:00 - 14:00
+"Hoban Washburne":
+  zone: "-04:00"
+  Monday: 11:00 - 19:00
+  Wednesday: 16:00 - 19:00
+  Thursday: 11:00 - 14:30
+"Jayne Cobb":
+  zone: "+05:00"
+  Mon,Tues,Wed,Thurs,Fri: 20:00 - 23:00
+"Zoe Washburne":
+  zone: "+04:00"
+  Monday,Tuesday,Thursday: 19:00 - 22:00
+"Inara Serra":
+  zone: "+00:00"
+  Monday,Tues,Thurs: 

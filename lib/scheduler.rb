@@ -1,15 +1,19 @@
+require 'rubygems'
 require 'runt'
 require 'forwardable'
+require 'scheduler/helpers/date_and_time_helper'
 require 'scheduler/expression'
 
 class Scheduler
   VERSION = '0.0.1'
 
   extend Forwardable
-
+    
   def initialize(&block)
     @schedule = Runt::Schedule.new
-    instance_eval(&block) if block_given?
+    if block_given?
+      block.arity == 1 ? block[self] : instance_eval(&block) 
+    end
   end
 
   # duration in minutes of the proposed meeting
@@ -22,8 +26,9 @@ class Scheduler
   # see scheduler_spec.rb for examples
   def participant(name, &block)
     event          = Runt::Event.new(name)
-    expression     = Expression.new.instance_eval(&block)
-    @schedule.add(event, expression)
+    expression     = Expression.new
+    block.arity == 1 ? block[expression] : expression.instance_eval(&block)
+    @schedule.add(event, expression.join)
   end
 
   def_delegator :@schedule, :events, :participants
@@ -107,3 +112,43 @@ class Scheduler
 
 end
 
+
+
+
+# Extensions for loading from file
+# Possibly for clarity this should be moved to a different source file
+# See README for example of YAML file format implemented below
+#
+require 'yaml'
+require 'scheduler/loadable'
+require 'scheduler/helpers/date_and_time_helper'
+
+class Scheduler
+
+  extend Loadable
+  include Helpers::DateAndTimeHelper
+
+  
+  load_files_of_format :yaml do |input, opts|
+    yaml = YAML.load(input)
+    raise ArgumentError unless yaml.is_a?(Hash)
+    new do
+      yaml.each do |partic, avails|
+        raise ArgumentError unless avails.is_a?(Hash)
+        opts[:zone] = avails.delete('zone') if avails['zone']
+        participant(partic) do |p|
+          avails.each do |dexpr, texpr|
+            days = parse_days(dexpr)
+            fr, to = parse_time_range(texpr, opts[:zone])
+            if fr && to
+              p.every( *(days << { :from => fr, :to => to }) )
+            else
+              p.every( *(days) )
+            end
+          end
+        end
+      end
+    end
+  end
+  
+end
