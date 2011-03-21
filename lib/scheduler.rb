@@ -96,7 +96,7 @@ class Scheduler
   end
 
   def to_s
-    to_a.map{|d,u| [dr, p].flatten.join("\n  ") }.join("\n")
+    to_a.map{|d,u| [d, u].flatten.join("\n  ") }.join("\n")
   end
 
   ## helper methods
